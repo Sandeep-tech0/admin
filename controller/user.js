@@ -1,10 +1,10 @@
 const connection = require('../model/DbConnect')
-
+const bcryt = require('bcrypt')
 
 ///=  user list get api function ===============================================//
 
 let userdata = async (req, res) => {
-    let sqlquery = 'SELECT *,r.role_name FROM admin_user as au left join roles as r on au.id=r.role_id; ';
+    let sqlquery = 'SELECT * FROM admin_user ';
 
     await connection.query(sqlquery, function (error, result) {
         if (error)
@@ -19,11 +19,13 @@ let userdata = async (req, res) => {
 
 ///= user Registeration post api fuction ====================//
 const postuser = async (req, res) => {
-    let roledata = req.body;
-    console.log(roledata);
-    let sqlQuery = "INSERT INTO  admin_user_login SET?";
+    let {id,name,password} = req.body;
+    const salt = await bcryt.genSalt(5);
+    const haashPassword = await bcryt.hash(password,salt);
+    const userdata= {id,name,password:haashPassword}
+    let sqlQuery = "INSERT INTO  admin_user SET?";
 
-    await connection.query(sqlQuery, roledata, function (error, result) {
+    await connection.query(sqlQuery, userdata, function (error, result) {
         if (error) {
             console.log("error", error.sqlMessage);
         }
@@ -56,18 +58,13 @@ const postuser = async (req, res) => {
 ///==== usermodify patch api function ===========================================
 const userUpdate = async (req, res) => {
     // const id  = req.params
-
-    const data = [
-
-        req.body.name,
-        req.body.status,
-        req.params.id,
-
-    ]
+const {id} = req.query
+const{name,password} = req.body
+   data = {name,password}
 
 
-    let sqlquery = 'UPDATE admin_user SET name=?,status=? WHERE id = ?';
-    a = await connection.query(sqlquery, data, (error, result) => {
+    let sqlquery = 'UPDATE admin_user SET? WHERE id = ?';
+    a = await connection.query(sqlquery,[data, id], (error, result) => {
         console.log(a.sql)
         if (error)
             console.log(error.sqlMessage);
@@ -85,22 +82,23 @@ const userUpdate = async (req, res) => {
 const userStatus = async (req, res) => {
     const data = [
 
-        req.body.status,
-        req.params.id,
+        req.query.status,
+        req.query.id,
     ]
 
 
-    let sqlquery = 'UPDATE admin_user SET status=? WHERE id = ?';
+    let sqlquery = 'UPDATE admin_user SET status =? WHERE id = ?';
     const a = await connection.query(sqlquery, data, (error, result) => {
         console.log(a.sql)
-        if (error)
+        if (error)  
             console.log(error.sqlMessage);
         else
             res.send(result);
     })
 }
 
-//======== userpassword change  patch api fuction  =====================================
+
+//======== userpassword change  patch api fuction   =====================================/////
 const changeUserPassword = async (req, res) => {
     try {
         const { oldPassword, newPassword, confirmPassword } = req.body
@@ -116,13 +114,16 @@ const changeUserPassword = async (req, res) => {
         // }
 
         let sqlquery = 'SELECT * FROM admin_user WHERE id = ? ';
-        await connection.query(sqlquery, id, async (err, result) => {
+      const a =  await connection.query(sqlquery, id, async (err, result) => {
             if (result.length == 0) {
                 return res.json({ status: 400, response: "user not found" });
             }
             if (err) {
                 return res.json({ status: 400, response: err.sqlMessage });
             }
+ 
+    const compare = await bcryt.compare()
+
             if (result.length != 0) {
                 if (oldPassword == result[0].password) {
                     if (result[0].password === newPassword) {
@@ -153,6 +154,7 @@ const changeUserPassword = async (req, res) => {
         res.json({ status: 400, response: error.message })
     }
 }
+
 
 
 //============== user list filter get api ==============================

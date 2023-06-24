@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Button,Modal,Form } from 'react-bootstrap';
 import ReactSwitch from 'react-switch';
-import '../retailer/style.css'
+import '../retailer/style.css';
+import axios from 'axios';
 
 const ViewOffer = () => {
   const [value, setValue] = React.useState("");
-  const [show, setShow] = useState(false);
+ 
+  const [data,setdata] = useState([])
+  const fetchData = async () => {
+    const apidata = await axios.get('http://localhost:4000/api/admin/offerdata')
+    console.log(apidata.data)
+    return setdata(apidata.data)
+  }
+  useEffect(() => { fetchData() }, [])
+  console.log("data", data)
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+
 
 
   
@@ -25,53 +33,33 @@ const ViewOffer = () => {
   <table>
   <thead>
     <tr>
-     <th>Offer Id </th> 
       <th>Offer Code </th>
       <th>Offer Name</th>
       <th>Valid From</th>
       <th>Valid To</th>
-      <th>Discount</th>
+      <th>Discount Upto</th>
+      <th>Flat Discount</th>
       <th>Status</th>
       
     </tr>
     </thead>
     <tbody className="trhover">
-    <tr>
-    <td>45  </td>
-    <td>231</td>
-    <td>sandeep </td>
-    <td> 25/02/2022 </td>
-    <td> 25/02/2022 </td>
-    <td>231</td>
+{data && data.map((item)=>{
+  return(
+  <tr>
+    <td>{item.offer_code} </td> 
+    <td>{item.offer_name}</td>
+    <td>{item.valid_from} </td>
+    <td> {item.valid_to} </td>
+    <td> {item.discount_upto}</td>
+    <td>{item.flat_discount}</td>
     <td> <ReactSwitch /> </td>
   </tr>
-  <tr>
-  <td>45  </td>
-  <td>231</td>
-  <td>sandeep </td>
-  <td> 25/02/2022 </td>
-  <td> 25/02/2022 </td>
-  <td>231</td>
-  <td> <ReactSwitch /> </td>
-  </tr>
-  <tr>
-  <td>45  </td>
-  <td>231</td>
-  <td>sandeep </td>
-  <td> 25/02/2022 </td>
-  <td> 25/02/2022 </td>
-  <td>231</td>
-  <td> <ReactSwitch /> </td>
-  </tr>
-  <tr>
-  <td>45  </td>
-  <td>231</td>
-  <td>sandeep </td>
-  <td> 25/02/2022 </td>
-  <td> 25/02/2022 </td>
-  <td>231</td>
-  <td> <ReactSwitch /> </td>
-  </tr></tbody>
+  )
+})}
+
+  
+  </tbody>
   </table></div>
   
   

@@ -10,6 +10,7 @@ import SubCategory from './pages/SubCategory';
 import LoginPage from './pages/LoginPage';
 import Retailer from './pages/retailer/Retailer';
 import Offer from './pages/offerzone/Offer';
+import UserChangePassword from './pages/userpassword/UserChangePassword';
 
 function App() {
   return (
@@ -25,6 +26,9 @@ function App() {
 <Route path='/login' element={<LoginPage/>}/>
 <Route path='/retailer' element={<Retailer/>}/>
 <Route path='/offer' element={<Offer/>}/>
+<Route path='/changepassword' element={<UserChangePassword/>}/>
+
+
 </Routes>
     
      

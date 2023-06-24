@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { IconContext } from "react-icons";
 import * as FaIcons from 'react-icons/fa';
 import { Button,Modal,Form } from 'react-bootstrap';
-import './style.css'
+import './style.css';
+import axios from "axios";
 
 const ViewRetailer = () => {
   const [value, setValue] = React.useState("");
@@ -10,6 +11,15 @@ const ViewRetailer = () => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+const [data,setdata] = useState([])
+  const fetchData = async () => {
+    const apidata = await axios.get('http://localhost:4000/api/admin/viewretailer')
+    console.log(apidata.data)
+    // setToogle(apidata.data.status)
+    return setdata(apidata.data)
+  }
+  useEffect(() => { fetchData() }, [])
+  console.log("data", data)
 
 
   
@@ -26,42 +36,48 @@ const ViewRetailer = () => {
   <table>
   <thead>
     <tr>
-     <th>Shop Id </th> 
+     <th>Retailer Id </th> 
       <th>Shope Name </th>
-      <th>Mobile No.</th>
+      <th>Owner Name </th>
+      <th>Registeration Number </th>
+      <th>Registeration  Doc.</th>
+      <th>Profile Photo</th>
+      <th>State</th>
+      <th>City</th>
+      <th>Address</th>
+      <th>Contact No.</th>
+      <th>Email</th>
+      <th>Status</th>
       <th>Action</th>
       
     </tr>
     </thead>
     <tbody className="trhover">
-    <tr>
-    <td>45  </td>
-    <td>sandeep </td>
-    <td> 25/02/2022 </td>
-    <td>{<IconContext.Provider value={{  size: 30 }}>< FaIcons.FaEdit onClick={handleShow} /></IconContext.Provider>} </td>
-    
-  </tr>
-  <tr>
-    <td>45  </td>
-    <td>sandeep </td>
-    <td> 25/02/2022 </td>
-    <td>{<IconContext.Provider value={{  size: 30 }}>< FaIcons.FaEdit onClick={handleShow} /></IconContext.Provider>} </td>
-    
-  </tr>
-  <tr>
-    <td>45  </td>
-    <td>sandeep </td>
-    <td> 25/02/2022 </td>
-    <td>{<IconContext.Provider value={{  size: 30 }}>< FaIcons.FaEdit onClick={handleShow} /></IconContext.Provider>} </td>
-    
-  </tr>
-  <tr>
-    <td>45  </td>
-    <td>sandeep </td>
-    <td> 25/02/2022 </td>
-    <td>{<IconContext.Provider value={{  size: 30 }}>< FaIcons.FaEdit onClick={handleShow} /></IconContext.Provider>} </td>
-    
-  </tr></tbody>
+    {data && data.map((item)=>{
+      return(
+        <tr>
+        <td>{item.retailer_id}</td>
+        <td>{item.shop_name} </td>
+        <td> {item.owner_name} </td>
+        <td> {item.registration_No} </td>
+        <td> {item.registration_doc} </td>
+        <td>{item.profile_photo} </td>
+        <td> {item.State}</td>
+        <td> {item.city} </td>
+        <td>{item.Address} </td>
+        <td> {item.Contact_No}</td>
+        <td> {item.Email} </td>
+        <td> {item.status} </td>
+        
+        
+        <td>{<IconContext.Provider value={{  size: 30 }}>< FaIcons.FaEdit onClick={handleShow} /></IconContext.Provider>} </td>
+        
+      </tr>
+      )
+    })}
+   
+ 
+  </tbody>
   </table></div>
   <Modal
   show={show}

@@ -12,12 +12,18 @@ import { useParams } from 'react-router-dom';
 const Roles = () => {
   const [value, setValue] = React.useState("");
   const [show, setShow] = useState(false);
- 
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+
+  const [show2, setShow2] = useState(false);
+
+  const handleClose2 = () => setShow2(false);
+  const handleShow2 = () => setShow2(true);
   const [data, setdata] = useState([]);
   const fetchData = async () => {
-    const apidata = await axios.get('http://localhost:5000/role/roledata')
+    const apidata = await axios.get('http://localhost:4000/api/admin//viewrole')
     return setdata(apidata.data)
   }
   useEffect(() => { fetchData() }, [])
@@ -38,59 +44,70 @@ const Roles = () => {
   }
   const handleSubmit = async () => {
     console.log("role data", roleData);
-    const api = await axios.post("http://localhost:5000/role/addrole", roleData)
+    const api = await axios.post("http://localhost:4000/api/admin/addrole", roleData)
     console.log("api", api.data)
-    
-     fetchData()
+    fetchData()
+   }
+
+  //////////////delete//////////////////////////////
+
+
+  // const deleteRole = async (id) => {
+  //   console.log("roleId", `http://localhost:4000//roledelete/${id}`);
+  //   const result = await axios.delete(`http://localhost:4000/api/admin/${id}`)
+  //   if (result === result) {
+  //     Swal.fire({
+  //       title: 'Are you sure?',
+  //       text: "You won't be able to revert this!",
+  //       icon: 'warning',
+  //       showCancelButton: true,
+  //       confirmButtonColor: '#3085d6',
+  //       cancelButtonColor: '#d33',
+  //       confirmButtonText: 'Yes, delete it!'
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+
+
+
+  //         Swal.fire(
+  //           'Deleted!',
+  //           'the user has been deleted.',
+  //           'success'
+
+  //         )
+  //       }
+
+  //     }).then(() => fetchData())
+
+  //   } else {
+  //     alert("user not deleted")
+  //   }}
+
+  ///////////////update///////////////////////
+  const [roleid, setRoleid] = useState("")
+
+
+  const handleEdit = async (id) => {
+
+    setRoleid(id)
+    handleShow2()
+  }
+
+
+  const handleUpdate = async () => {
+
+    console.log("user data", roleData);
+    const api = await axios.patch(`http://localhost:4000/api/admin/updaterole/${roleid}`, roleData)
+    console.log("api", api.data)
+    await fetchData()
+    handleClose2()
 
   }
-//////////////delete//////////////////////////////
 
-  
-  const deleteRole = async (id) => {
-    console.log("roleId", `http://localhost:5000/role/roledelete/${id}`);
-    const result = await axios.delete(`http://localhost:5000/role/deleterole/${id}`)
-    if (result === result) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
+  const filteredData = data.filter((item) =>
+    item.role_name.toLowerCase().includes(value.toLowerCase())
+  );
 
-
-          
-          Swal.fire(
-            'Deleted!',
-            'the user has been deleted.',
-            'success'
-
-          )
-        }
-        
-      }).then(() => fetchData())
-
-    } else {
-      alert("user not deleted")
-    }}
-
-///////////////update///////////////////////
-const { role_id } = useParams()
-const handleUpdate = async (role_id) => {
-  
-  console.log("user data", roleData);
-  const api = await axios.patch(`http://localhost:5000/role/roleupdate/${role_id}`, roleData)
-  console.log("api", api.data)
-  
-}
-
-  
-  
-  
 
 
 
@@ -115,8 +132,8 @@ const handleUpdate = async (role_id) => {
             </tr>
           </thead>
           <tbody className="trhover">
-          
-            {data.map((value) => {
+
+            {filteredData.map((value) => {
               return (
 
 
@@ -124,20 +141,16 @@ const handleUpdate = async (role_id) => {
                   <td>{value.role_id} </td>
                   <td>{value.role_name} </td>
 
-                  <td>{<IconContext.Provider value={{ size: 30 }}>< FaIcons.FaEdit onClick={()=>handleShow(value.role_id)} /> <AiIcons.AiFillDelete onClick={() => deleteRole(value.role_id)} /></IconContext.Provider>} </td>
+                  <td>{<IconContext.Provider value={{ size: 30 }}>< FaIcons.FaEdit onClick={() => handleEdit(value.role_id)} /> <AiIcons.AiFillDelete /></IconContext.Provider>} </td>
 
-                </tr>
-
-
-              )
-
-
-
-
+                </tr>)
             })}
 
           </tbody>
-        </table></div>
+        </table>
+      </div>
+
+
       <Modal
         show={show}
         onHide={handleClose}
@@ -165,13 +178,41 @@ const handleUpdate = async (role_id) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => handleSubmit() } >Add</Button>
+          <Button variant="primary" onClick={() => handleSubmit()} >Add</Button>
         </Modal.Footer>
       </Modal>
 
 
+      <Modal
+        show={show2}
+        onHide={handleClose2}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Edit New  Role</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Role Id</Form.Label>
+            <Form.Control type="text" name="role_id" value={roleid} onChange={handleChange} disabled />
+
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Role Name</Form.Label>
+            <Form.Control type="text" placeholder="role name" name="role_name" value={roleData.role_name} onChange={handleChange} />
+
+          </Form.Group>
 
 
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose2}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={() => handleUpdate()} >Save</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
 
 

@@ -1,9 +1,10 @@
 const connection= require('../model/DbConnect')
 
 let subcategorydata = async (req,res) => {
-    let sqlquery = 'SELECT * FROM  sub_category';
+    let sqlquery = 'SELECT * FROM  category NATURAL JOIN sub_category';
 
     await connection.query(sqlquery, function (error, result) {
+    
         if (error)
             console.log(error.sqlMessage);
         else
@@ -13,20 +14,30 @@ let subcategorydata = async (req,res) => {
 } 
 
 
-const postsubcategory = async (req, res) => {
-    let roledata = req.body;
-    console.log(roledata);
-    let sqlQuery = "INSERT INTO  sub_category SET?";
-
-    await connection.query(sqlQuery, roledata, function (error, result) {
-        if (error) {
-            console.log("error", error.sqlMessage);
-        }
-        else {
-            res.send(result);
-        }
-    })
+const postsubcategory = async (req,res) =>{
+    try {
+        const data = [
+          req.body.Category_id,
+          req.body.sub_category_id,
+          req.body.subcategory_name,
+          req.file.location
+         ];
+         console.log(data)
+        const sql = "INSERT INTO sub_category(Category_id,sub_category_id,subcategory_name,subcategory_image) values(?,?,?,?)";
+       const a = await connection.query(sql, data, (error, result) => {
+        console.log(a.sql)
+            console.log(result, "result");
+if (error) {
+res.send({ status: 400, Error: error.sqlMessage });
+} else {
+res.send({ status: 200, response: result });
+}
+});
+} catch (error) {
+res.send({ Error: error.sqlMessage });
+}
 };
+   
 
 const deletesubcategory = async (req, res) => {
     try {
@@ -47,18 +58,31 @@ const deletesubcategory = async (req, res) => {
 
 }
 
-const subcategoryUpdate = async (req, res) => {
-    const { sub_category_id } = req.params
-    const { subcategory_name,subcategory_image} = req.body
-    const data = {subcategory_name,subcategory_image}
-    let sqlquery = 'UPDATE sub_category SET ? WHERE sub_category_id = ?';
-    await connection.query(sqlquery, [data, sub_category_id], (error, result) => {
-        if (error)
-            console.log(error.sqlMessage);
-        else
-            res.send(result);
-    })
+const subcategoryUpdate = async (req,res) =>{
+    try {
+    
+        const {sub_category_id} = req.query;
+        const {category_id} = req.query;
+
+        const {subcategory_name} = req.body;
+        const subcategory_image = req.file.location;
+
+       data = {subcategory_name,subcategory_image}
+
+        const sql = "UPDATE sub_category SET ? WHERE  sub_category_id= ? AND category_id=? ";
+       const a = await connection.query(sql, [data,sub_category_id,category_id], (error, result) => {
+        console.log(a.sql)
+            console.log(result, "result");
+if (error) {
+res.send({ status: 400, Error: error.sqlMessage });
+} else {
+res.send({ status: 200, response: result });
 }
+});
+} catch (error) {
+res.send({ Error: error.sqlMessage });
+}
+};
 
 
 module.exports = {subcategoryUpdate,subcategorydata,deletesubcategory,postsubcategory}

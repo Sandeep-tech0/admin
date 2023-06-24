@@ -6,8 +6,6 @@ import * as AiIcons from 'react-icons/ai';
 import { SidebarData } from './SidebarData';
 import SubMenu from './SubMenu';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-
-
 import { IconContext } from 'react-icons/lib';
 
 
@@ -70,6 +68,9 @@ const Sidebar = () => {
           <span style={{ color: "white", fontSize: "35px", marginLeft: "750px" }}> Welcome:  Sandeep</span>
 
           <NavDropdown id="collasible-nav-dropdown" style={{ color: "white", fontSize: "27px", marginLeft: "10px" }}>
+            <NavDropdown.Item href="/changepassword">
+              Change Password
+            </NavDropdown.Item>
             <NavDropdown.Item href="/profile" >View Profile</NavDropdown.Item>
             <NavDropdown.Item href="/login">
               Logout
@@ -94,7 +95,7 @@ const Sidebar = () => {
                 width='100'
                 alt=''
                 loading='lazy'
-                 />
+              />
             </NavIcon>
 
             {SidebarData.map((item, index) => {
